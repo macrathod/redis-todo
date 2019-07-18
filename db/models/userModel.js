@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
 const userSchema = new Schema({
-  name: String,
-  username: { type: String, unique: false }, // TODO: change this to true
-  email: { type: String, unique: false },
-  password: String
+  name: { type: String, required: true },
+  username: { type: String, unique: false, required: true }, // TODO: change this to true
+  email: { type: String, unique: false, required: true },
+  password: { type: String, required: true }
 }, { timestamps: true, versionKey: false })
 
 userSchema.methods.toJSON = function () {

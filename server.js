@@ -12,6 +12,7 @@ app.use(require('morgan')('dev'))
 
 // ROUTERS
 app.use('/user', require('./routers/userRouter'))
+app.use('/todo', require('./routers/todoRouter'))
 
 // Server setup
 const httpServer = http.createServer(app)

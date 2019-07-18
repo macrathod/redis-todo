@@ -1,6 +1,7 @@
 const Router = require('express').Router()
 const bcrypt = require('bcryptjs')
 const User = require('../db/models/userModel')
+const Todo = require('../db/models/todoModel')
 const auth = require('../middleware/auth')
 
 /* @public
@@ -74,6 +75,7 @@ Router.post('/update', auth, async ({ userId, body }, res) => {
 Router.delete('/delete', auth, async ({ userId }, res) => {
   try {
     await User.findByIdAndRemove({ _id: userId })
+    await Todo.deleteMany({ userId })
     res.status(200).send({ msg: 'User deleted' })
   } catch (err) {
     res.status(501).send('Server Error: ' + err)
