@@ -1,19 +1,7 @@
 const Router = require('express').Router()
+const bcrypt = require('bcryptjs')
 const User = require('../db/models/userModel')
 const auth = require('../middleware/auth')
-
-/* @public
- * @func: fetch all users
- * @return: users list
- */
-Router.get('/all', async (req, res) => {
-  try {
-    const users = await User.find({})
-    res.status(200).json(users)
-  } catch (err) {
-    res.status(500).send('Server Error', err)
-  }
-})
 
 /* @public
  * @func: create new user
@@ -30,10 +18,32 @@ Router.post('/create', async (req, res) => {
     const token = await user.genAuthToken()
 
     await user.save()
-    res.status(201).json({ user, token })
+    res.status(201).json({ token })
   } catch (err) {
-    // res.status(501).send('Server Error', err)
+    res.status(501).send('Server Error: ' + err)
+  }
+})
+
+/* @public
+ * @func: login user
+ * @input: user/email, password
+ * @return: auth token
+ */
+Router.post('/login', async ({ body }, res) => {
+  try {
+    console.log(body)
+    const user = await User.findOne({ $or: [{ email: body.email }, { username: body.username }] })
+    if (!user) return res.status(404).send({ msg: 'Invlid Crendtial' })
+
+    console.log(user)
+    const isPassword = await bcrypt.compare(body.password, user.password)
+    if (!isPassword) return res.status(404).send({ msg: 'Invlaid Credential' })
+
+    const token = user.genAuthToken()
+    res.status(201).json({ token })
+  } catch (err) {
     console.log(err)
+    res.status(501).send('Server Error: ' + err)
   }
 })
 
@@ -55,6 +65,18 @@ Router.post('/update', auth, async ({ userId, body }, res) => {
     res.status(200).json({ user: updatedUser })
   } catch (err) {
     res.status(500).send('Server Error', err)
+  }
+})
+
+/* @private
+ * @func: delete user
+ */
+Router.delete('/delete', auth, async ({ userId }, res) => {
+  try {
+    await User.findByIdAndRemove({ _id: userId })
+    res.status(200).send({ msg: 'User deleted' })
+  } catch (err) {
+    res.status(501).send('Server Error: ' + err)
   }
 })
 
