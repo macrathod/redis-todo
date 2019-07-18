@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(require('morgan')('dev'))
 
 // ROUTERS
-app.use('/api', require('./routers/userRouter'))
+app.use('/user', require('./routers/userRouter'))
 
 // Server setup
 const httpServer = http.createServer(app)
