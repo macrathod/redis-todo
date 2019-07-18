@@ -29,6 +29,7 @@
     "redis": "^2.8.0"
   },
   "devDependencies": {
+    "morgan": "^1.9.1",
     "snazzy": "^8.0.0",
     "standard": "^13.0.2"
   }
