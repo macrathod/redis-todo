@@ -1,16 +1,18 @@
 const Router = require('express').Router()
-const auth = require('../middleware/auth')
 const Todo = require('../db/models/todoModel')
+const auth = require('../middleware/auth')
+const clearCache = require('../middleware/clearCache')
 
 /* @private
  * @func: fetch all user todos
  * @input: user id
  * @return: todos
  */
-Router.get('/all', auth, ({ userId }, res) => {
+Router.get('/all', auth, async ({ userId }, res) => {
   try {
-    return Todo.find({ userId })
+    res.status(200).json({ todos: await Todo.find({ userId }).sort({ createdAt: -1 }).cache({ key: userId }) })
   } catch (err) {
+    console.log(err)
     res.status(501).send('Server Error: ' + err)
   }
 })
@@ -20,7 +22,7 @@ Router.get('/all', auth, ({ userId }, res) => {
  * @input: todo data, userid
  * @return: todo
  */
-Router.post('/create', auth, async ({ userId, body }, res) => {
+Router.post('/create', auth, clearCache, async ({ userId, body }, res) => {
   try {
     const todo = new Todo({ ...body, userId })
     await todo.save()

@@ -3,6 +3,7 @@ const express = require('express')
 
 // DB
 require('./db')
+require('./services/cache')
 
 const app = express()
 app.use(express.json())
